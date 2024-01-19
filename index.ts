@@ -40,9 +40,9 @@ const usuario1: Usuario = {
 }
 
 const usuario2: Usuario = {
-    nome: "Natália",
-    email: "natalia@email.com",
-    cpf: "012.321.234-32",
+    nome: "Íris",
+    email: "iriska@email.com",
+    cpf: "111.111.111-11",
     endereco: null
 }
 
@@ -90,4 +90,13 @@ const detalharUsuario = (cpfUsuario: string): Usuario => {
     }) as Usuario;
 }
 
-console.log(detalharUsuario("000.000.000-00"));
+const excluirUsuario = (cpfUsuario: string): Usuario | null => {
+    const arrayUsuarios: Usuario[] = listarUsuarios();
+    const usuarioExcluido = arrayUsuarios.find(pessoa => pessoa.cpf === cpfUsuario);
+
+    const novoArray = arrayUsuarios.filter(pessoa => pessoa.cpf !== cpfUsuario);
+    escreverArquivo(novoArray);
+
+    if (usuarioExcluido) return usuarioExcluido;
+    else return null
+}
