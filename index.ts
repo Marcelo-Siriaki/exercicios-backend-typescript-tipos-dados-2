@@ -43,6 +43,7 @@ const usuario2: Usuario = {
     nome: "Íris",
     email: "iriska@email.com",
     cpf: "111.111.111-11",
+    profissao: "Estudante",
     endereco: null
 }
 
@@ -69,8 +70,15 @@ const cadastrarUsuario = (infos: Usuario): Usuario => {
 }
 
 
-const listarUsuarios = (): Usuario[] => {
-    return lerArquivo() as Usuario[];
+const listarUsuarios = (filtro?: string): Usuario[] => {
+    const bd = lerArquivo() as Usuario[];
+    const usuarios = bd.filter((pessoa) => {
+        if (filtro) {
+            return pessoa.profissao === filtro;
+        } else return pessoa
+    });
+
+    return usuarios;
 }
 
 
@@ -84,19 +92,43 @@ const atualizarUsuario = (usuarioAtualizado: Usuario): Usuario => {
     return usuarioAtualizado;
 }
 
+//outra forma de atualizar o usuario seria:
+const atualizarUsuarioAlternativo = (cpf: string, dados: Usuario): Usuario => {
+    const bd = lerArquivo() as Usuario[];
+    const usuario = bd.find(pessoa => pessoa.cpf === cpf);
+
+    if (!usuario) {
+        throw new Error(`Usuário de CPF ${cpf} não encontrado`);
+    }
+
+    Object.assign(usuario, dados);
+    escreverArquivo(bd);
+    return dados;
+}
+
 const detalharUsuario = (cpfUsuario: string): Usuario => {
-    return listarUsuarios().find((pessoa) => {
+    const novoArray = listarUsuarios() as Usuario[];
+    const usuarioListado = novoArray.find((pessoa) => {
         return pessoa.cpf === cpfUsuario;
-    }) as Usuario;
+    });
+
+    if (!usuarioListado) {
+        throw new Error("Usuário cadastradao com esse CPF não encontrado");
+    }
+
+    return usuarioListado;
 }
 
 const excluirUsuario = (cpfUsuario: string): Usuario | null => {
     const arrayUsuarios: Usuario[] = listarUsuarios();
     const usuarioExcluido = arrayUsuarios.find(pessoa => pessoa.cpf === cpfUsuario);
 
+    if (!usuarioExcluido) {
+        throw new Error(`CPF: ${cpfUsuario} não encontrado`);
+    }
+
     const novoArray = arrayUsuarios.filter(pessoa => pessoa.cpf !== cpfUsuario);
     escreverArquivo(novoArray);
 
-    if (usuarioExcluido) return usuarioExcluido;
-    else return null
+    return usuarioExcluido;
 }
